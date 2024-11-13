@@ -1,5 +1,7 @@
+require('dotenv').config();
+
 const express = require('express');
-const gpuRoutes = require('./routes/gpuRoutes');
+const gpuInfoRoute = require('./routes/gpuInfoRoute');
 const cors = require('cors');
 
 const app = express();
@@ -7,9 +9,9 @@ app.use(cors());
 app.use(express.json());
 
 // Use the GPU routes
-app.use('/api', gpuRoutes);
+app.use('/api', gpuInfoRoute);
 
-const PORT = 5000;
+const PORT =  process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

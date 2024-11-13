@@ -1,13 +1,13 @@
-const gpuModel = require('../models/gpuModel');
+const gpuInfoModel = require('../models/gpuInfoModel');
 
 // Controller function to handle the GET request
-const getGpuData = async (req, res) => {
+const getGpuInfo = async (req, res) => {
   try {
-    const data = await gpuModel.getGpus();
+    const data = await gpuInfoModel.getGpuInfo();
     res.status(200).json(data);
   } catch (error) {
     res.status(500).json({ error: 'Database query failed' });
   }
 };
 
-module.exports = { getGpuData };
+module.exports = { getGpuInfo };

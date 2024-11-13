@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const gpuController = require('../controllers/gpuController');
+const gpuInfoCont = require('../controllers/gpuInfoCont');
 
 // Define the route to get GPU data
-router.get('/gpus', gpuController.getGpuData);
+router.get('/gpuInfo', gpuInfoCont.getGpuInfo);
 
 module.exports = router;
