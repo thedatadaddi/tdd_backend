@@ -1,3 +1,4 @@
+//backend/models/gpuInfoModel.js
 const { Pool } = require('pg');
 
 // PostgreSQL connection setup

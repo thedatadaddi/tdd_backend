@@ -1,3 +1,4 @@
+//backend/controllers/gpuInfoCont.js
 const gpuInfoModel = require('../models/gpuInfoModel');
 
 // Controller function to handle the GET request
