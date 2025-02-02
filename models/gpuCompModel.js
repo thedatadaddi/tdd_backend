@@ -61,7 +61,8 @@ const getPriceTsData = async (gpu_id) => {
   }
 };
 
-const getGpuPriceMinMax = async (column_name, gpu_id) => {
+const getGpuPriceMinMax = async (source_name, column_name, gpu_id ) => {
+
   // Define a whitelist of valid column names
   const validColumns = ['price_avg', 'price_med', 'price_best'];
 
@@ -70,8 +71,19 @@ const getGpuPriceMinMax = async (column_name, gpu_id) => {
     throw new Error('Invalid column name');
   }
 
-  // Dynamically construct the WHERE clause based on the `gpu_id` value
-  const whereClause = gpu_id === 'all' ? '' : 'WHERE gpu_id = $1';
+  // Ensure source_name is provided
+  if (!source_name) {
+    throw new Error('source_name must be specified');
+  }
+
+  // Dynamically construct the WHERE clause
+  let whereClause = 'WHERE source_name = $1';
+  let params = [source_name];
+
+  if (gpu_id !== 'all') {
+    whereClause += ' AND gpu_id = $2';
+    params.push(gpu_id);
+  }
 
   // Construct the query dynamically using the validated column name
   const query = `
@@ -81,9 +93,7 @@ const getGpuPriceMinMax = async (column_name, gpu_id) => {
   `;
 
   try {
-    // If gpu_id is "all", no parameter needs to be passed
-    const params = gpu_id === 'all' ? [] : [gpu_id];
-    const result = await pool.query(query, params); // Use placeholders only for specific gpu_id
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     console.error('Error executing query', error);

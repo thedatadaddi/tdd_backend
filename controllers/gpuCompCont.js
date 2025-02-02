@@ -30,12 +30,12 @@ const getPriceTsData = async (req, res) => {
 // Controller function to handle the POST request
 const getGpuPriceMinMax = async (req, res) => {
   try {
-    const { column_name, gpu_id } = req.body; // Extract gpu_id from the request body
+    const { source_name, column_name, gpu_id } = req.body; // Extract gpu_id from the request body
     if (!gpu_id) {
       return res.status(400).json({ error: 'Missing column_name or gpu_id in the request body' });
     }
 
-    const data = await gpuCompModel.getGpuPriceMinMax(column_name, gpu_id);
+    const data = await gpuCompModel.getGpuPriceMinMax(source_name, column_name, gpu_id);
     res.status(200).json(data);
   } catch (error) {
     console.error('Error in getGpuPriceMinMax:', error);
