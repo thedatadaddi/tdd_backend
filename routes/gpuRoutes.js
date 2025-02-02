@@ -1,11 +1,15 @@
 //backend/routes/gpuRoutes.js
 const express = require('express');
 const router = express.Router();
-const gpuInfoCont = require('../controllers/gpuInfoCont');
-const gpuPriceTsCont = require('../controllers/gpuPriceTsCont');
+const gpuCompCont = require('../controllers/gpuCompCont');
+
+// // Define the routes to get GPU data
+// router.get('/gpuInfo', gpuInfoCont.getGpuInfo);
+// router.post('/gpuPriceTs', gpuPriceTsCont.getPriceTsData);
 
 // Define the routes to get GPU data
-router.get('/gpuInfo', gpuInfoCont.getGpuInfo);
-router.post('/gpuPriceTs', gpuPriceTsCont.getPriceTsData);
+router.get('/gpuInfo', gpuCompCont.getGpuInfo);
+router.post('/gpuPriceTs', gpuCompCont.getPriceTsData);
+router.post('/gpuPriceMinMax', gpuCompCont.getGpuPriceMinMax)
 
 module.exports = router;
