@@ -8,7 +8,7 @@ const gpuCompCont = require('../controllers/gpuCompCont');
 // router.post('/gpuPriceTs', gpuPriceTsCont.getPriceTsData);
 
 // Define the routes to get GPU data
-router.get('/gpuInfo', gpuCompCont.getGpuInfo);
+router.post('/gpuInfo', gpuCompCont.getGpuInfo);
 router.post('/gpuPriceTs', gpuCompCont.getPriceTsData);
 router.post('/gpuPriceMinMax', gpuCompCont.getGpuPriceMinMax)
 

@@ -28,19 +28,30 @@ const getEasternDate = () => {
 };
 
 // Function to get GPU data with JOIN on today's date in EST
-const getGpuInfo = async () => {
-  const estDate = getEasternDate();
+const getGpuInfo = async (source_name) => {
+  const estDate = getEasternDate(); // Function to get today's date in EST
+  let whereClause = ['p.date_checked = $1']; // Always filter by today's date
+  let params = [estDate];
 
+  if (source_name !== 'all') {
+    whereClause.push('p.source_name = $' + (params.length + 1));
+    params.push(source_name);
+  }
+
+  // Join conditions dynamically
+  const whereSQL = whereClause.length > 0 ? 'WHERE ' + whereClause.join(' AND ') : '';
+
+  // Construct the query dynamically
   const query = `
     SELECT g.*, p.price_id, p.source_name, p.date_checked, 
            p.price_avg, p.price_med, p.price_best, p.link_best
     FROM gpu_info AS g
     INNER JOIN price_info AS p USING (gpu_id)
-    WHERE p.date_checked = $1;
+    ${whereSQL};
   `;
-  
+
   try {
-    const result = await pool.query(query, [estDate]);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     console.error('Error executing query', error);
@@ -48,12 +59,32 @@ const getGpuInfo = async () => {
   }
 };
 
-const getPriceTsData = async (gpu_id) => {
+const getPriceTsData = async (source_name, gpu_id) => {
 
-  const query = `select * from price_info where gpu_id = $1;`;
-  
+  let whereClause = [];
+  let params = [];
+
+  if (source_name !== 'all') {
+    whereClause.push('source_name = $' + (params.length + 1));
+    params.push(source_name);
+  }
+
+  if (gpu_id !== 'all') {
+    whereClause.push('gpu_id = $' + (params.length + 1));
+    params.push(gpu_id);
+  }
+
+  // Join conditions dynamically
+  const whereSQL = whereClause.length > 0 ? 'WHERE ' + whereClause.join(' AND ') : '';
+
+  // Construct the query dynamically
+  const query = `
+    SELECT * FROM price_info
+    ${whereSQL};
+  `;
+
   try {
-    const result = await pool.query(query, [gpu_id]);
+    const result = await pool.query(query, params);
     return result.rows;
   } catch (error) {
     console.error('Error executing query', error);
@@ -61,8 +92,7 @@ const getPriceTsData = async (gpu_id) => {
   }
 };
 
-const getGpuPriceMinMax = async (source_name, column_name, gpu_id ) => {
-
+const getGpuPriceMinMax = async (source_name, column_name, gpu_id) => {
   // Define a whitelist of valid column names
   const validColumns = ['price_avg', 'price_med', 'price_best'];
 
@@ -71,25 +101,28 @@ const getGpuPriceMinMax = async (source_name, column_name, gpu_id ) => {
     throw new Error('Invalid column name');
   }
 
-  // Ensure source_name is provided
-  if (!source_name) {
-    throw new Error('source_name must be specified');
-  }
-
   // Dynamically construct the WHERE clause
-  let whereClause = 'WHERE source_name = $1';
-  let params = [source_name];
+  let whereClause = [];
+  let params = [];
+
+  if (source_name !== 'all') {
+    whereClause.push('source_name = $' + (params.length + 1));
+    params.push(source_name);
+  }
 
   if (gpu_id !== 'all') {
-    whereClause += ' AND gpu_id = $2';
+    whereClause.push('gpu_id = $' + (params.length + 1));
     params.push(gpu_id);
   }
+
+  // Join conditions dynamically
+  const whereSQL = whereClause.length > 0 ? 'WHERE ' + whereClause.join(' AND ') : '';
 
   // Construct the query dynamically using the validated column name
   const query = `
     SELECT MIN(${column_name}) AS min_, MAX(${column_name}) AS max_
     FROM price_info
-    ${whereClause};
+    ${whereSQL};
   `;
 
   try {

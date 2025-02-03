@@ -4,7 +4,8 @@ const gpuCompModel = require('../models/gpuCompModel');
 // Controller function to handle the GET request
 const getGpuInfo = async (req, res) => {
     try {
-      const data = await gpuCompModel.getGpuInfo();
+      const { source_name } = req.body;
+      const data = await gpuCompModel.getGpuInfo(source_name);
       res.status(200).json(data);
     } catch (error) {
       res.status(500).json({ error: 'Database query failed' });
@@ -14,12 +15,13 @@ const getGpuInfo = async (req, res) => {
 // Controller function to handle the POST request
 const getPriceTsData = async (req, res) => {
   try {
-    const { gpu_id } = req.body; // Extract gpu_id from the request body
+    const { source_name, gpu_id } = req.body; // Extract gpu_id from the request body
+
     if (!gpu_id) {
       return res.status(400).json({ error: 'Missing gpu_id in the request body' });
     }
 
-    const data = await gpuCompModel.getPriceTsData(gpu_id);
+    const data = await gpuCompModel.getPriceTsData(source_name, gpu_id);
     res.status(200).json(data);
   } catch (error) {
     console.error('Error in getPriceTsData:', error);
