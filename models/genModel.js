@@ -1,4 +1,3 @@
-//backend/models/genModel.js
 const { Pool } = require('pg');
 
 // PostgreSQL connection setup
@@ -49,8 +48,37 @@ const fetchCachedTableMetadata = async () => {
     return metadata;
 };
 
+// Function to fetch the data types of all columns in a given table
+const queryColumnDataTypes = async (table) => {
+    const cacheKey = `columnTypes_${table}`;
+    let cachedResult = metadataCache.get(cacheKey);
+    if (cachedResult) {
+        return cachedResult;
+    }
+    
+    const query = `
+      SELECT column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = $1;
+    `;
+    
+    try {
+        const result = await pool.query(query, [table]);
+        const columnDataTypes = result.rows.reduce((acc, row) => {
+            acc[row.column_name] = row.data_type;
+            return acc;
+        }, {});
+    
+        metadataCache.set(cacheKey, columnDataTypes);
+        return columnDataTypes;
+    } catch (error) {
+        console.error("Error fetching column data types:", error);
+        throw error;
+    }
+};
+
 // Function to query unique values from a table column
-const queryUniqueColValues = async (table, column) => {
+const queryUniqueColumnValues = async (table, column) => {
     const tableMetadata = await fetchCachedTableMetadata();
   
     if (!tableMetadata[table] || !tableMetadata[table].includes(column)) {
@@ -130,4 +158,4 @@ const queryMinMaxValues = async (table, column) => {
     }
 };
 
-module.exports = { queryUniqueColValues, queryAllColumns, queryMinMaxValues };
+module.exports = { queryUniqueColumnValues, queryAllColumns, queryMinMaxValues, queryColumnDataTypes };

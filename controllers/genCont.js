@@ -1,8 +1,7 @@
-//backend/controllers/genCont.js
 const genModel = require("../models/genModel");
 
 // Controller function to get unique values from a column
-const getUniqueColValues = async (req, res) => {
+const getUniqueColumnValues = async (req, res) => {
   try {
     const { table, column } = req.body;
 
@@ -10,7 +9,7 @@ const getUniqueColValues = async (req, res) => {
       return res.status(400).json({ error: "Missing table or column in request body" });
     }
 
-    const data = await genModel.queryUniqueColValues(table, column);
+    const data = await genModel.queryUniqueColumnValues(table, column);
     res.status(200).json(data);
   } catch (error) {
     console.error("Error in getUniqueColValues:", error);
@@ -52,5 +51,21 @@ const getMinMaxValues = async (req, res) => {
   }
 };
 
-module.exports = { getUniqueColValues, getAllColumns, getMinMaxValues };
+// Controller function to get data types of all columns in a table
+const getColumnDataTypes = async (req, res) => {
+  try {
+    const { table } = req.body;
 
+    if (!table) {
+      return res.status(400).json({ error: "Missing table name in request body" });
+    }
+
+    const data = await genModel.queryColumnDataTypes(table);
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Error in getColumnDataTypes:", error);
+    res.status(500).json({ error: "Database query failed" });
+  }
+};
+
+module.exports = { getUniqueColumnValues, getAllColumns, getMinMaxValues, getColumnDataTypes };
