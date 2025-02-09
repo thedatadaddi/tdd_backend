@@ -14,5 +14,6 @@ router.post('/gpuPriceTs', gpuCompCont.getPriceTsData);
 router.post('/gpuPriceMinMax', gpuCompCont.getGpuPriceMinMax)
 router.post('/getUniqueColVals', genCont.getUniqueColValues);
 router.post('/getAllCols', genCont.getAllColumns);
+router.post('/getMinMaxValues', genCont.getMinMaxValues);
 
 module.exports = router;
